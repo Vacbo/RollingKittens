@@ -5,35 +5,62 @@ using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject mainSlime;
-    public Button idleBut, walkBut,jumpBut,attackBut,damageBut0,damageBut1,damageBut2;
-    public Camera cam;
+    public GameObject mainSlime; // Reference to the player-controlled character
+    public Button idleBut, walkBut, jumpBut, attackBut, damageBut0, damageBut1, damageBut2;
+    public Camera cam; // Reference to the main camera
+    private PlayerControllerAI playerController;
+
     private void Start()
     {
-        
-        idleBut.onClick.AddListener( delegate { Idle(); } );
-        walkBut.onClick.AddListener(delegate {  ChangeStateTo(SlimeAnimationState.Walk); });
+        // Get the PlayerController component from the player (mainSlime)
+        playerController = mainSlime.GetComponent<PlayerControllerAI>();
+
+        // Set up button listeners
+        idleBut.onClick.AddListener(delegate { Idle(); });
+        walkBut.onClick.AddListener(delegate { ChangeStateTo(SlimeAnimationState.Walk); });
         jumpBut.onClick.AddListener(delegate { LookAtCamera(); ChangeStateTo(SlimeAnimationState.Jump); });
         attackBut.onClick.AddListener(delegate { LookAtCamera(); ChangeStateTo(SlimeAnimationState.Attack); });
-        damageBut0.onClick.AddListener(delegate { LookAtCamera(); ChangeStateTo(SlimeAnimationState.Damage); mainSlime.GetComponent<EnemyAi>().damType = 0; });
-        damageBut1.onClick.AddListener(delegate { LookAtCamera(); ChangeStateTo(SlimeAnimationState.Damage); mainSlime.GetComponent<EnemyAi>().damType = 1; });
-        damageBut2.onClick.AddListener(delegate { LookAtCamera(); ChangeStateTo(SlimeAnimationState.Damage); mainSlime.GetComponent<EnemyAi>().damType = 2; });
+        damageBut0.onClick.AddListener(delegate { LookAtCamera(); SetDamageTypeAndChangeState(0); });
+        damageBut1.onClick.AddListener(delegate { LookAtCamera(); SetDamageTypeAndChangeState(1); });
+        damageBut2.onClick.AddListener(delegate { LookAtCamera(); SetDamageTypeAndChangeState(2); });
     }
+
+    // Function to change to the Idle state
     void Idle()
     {
         LookAtCamera();
-        mainSlime.GetComponent<EnemyAi>().CancelGoNextDestination();
         ChangeStateTo(SlimeAnimationState.Idle);
     }
+
+    // Change the player state by updating the state variable in PlayerController
     public void ChangeStateTo(SlimeAnimationState state)
     {
-       if (mainSlime == null) return;    
-       if (state == mainSlime.GetComponent<EnemyAi>().currentState) return;
+        if (mainSlime == null || playerController == null) return;
 
-       mainSlime.GetComponent<EnemyAi>().currentState = state ;
+        // Avoid unnecessary state changes
+        if (state == playerController.currentState) return;
+
+        // Change the player's current animation state
+        playerController.currentState = state;
     }
+
+    // Make the character look at the camera
     void LookAtCamera()
     {
-       mainSlime.transform.rotation = Quaternion.Euler(new Vector3(mainSlime.transform.rotation.x, cam.transform.rotation.y, mainSlime.transform.rotation.z));   
+        Vector3 lookAtPosition = cam.transform.position;
+        lookAtPosition.y = mainSlime.transform.position.y; // Lock the Y axis to avoid tilting up/down
+        mainSlime.transform.LookAt(lookAtPosition);
+    }
+
+    // Set the damage type and change the state to Damage
+    void SetDamageTypeAndChangeState(int damageType)
+    {
+        if (playerController == null) return;
+
+        // Set the damage type in PlayerController
+        playerController.damType = damageType;
+
+        // Change the state to Damage
+        ChangeStateTo(SlimeAnimationState.Damage);
     }
 }
