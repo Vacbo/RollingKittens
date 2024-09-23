@@ -237,7 +237,7 @@ GameObject:
   - component: {fileID: 8713460599442982928}
   m_Layer: 0
   m_Name: Ground
-  m_TagString: Untagged
+  m_TagString: Ground
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -276,8 +276,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 14, y: 0, z: 16.25}
-  m_Center: {x: -2, y: 1, z: -7.1}
+  m_Size: {x: 14, y: 0, z: 16.6}
+  m_Center: {x: -2, y: 1, z: -7}
 --- !u!1 &3994175640004402403
 GameObject:
   m_ObjectHideFlags: 0
