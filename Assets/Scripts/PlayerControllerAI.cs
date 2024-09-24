@@ -120,9 +120,7 @@ public class PlayerControllerAI : MonoBehaviour
         float vertical = Input.GetAxis("Vertical");
 
         // Create a movement vector based on input
-        Vector3 direction = new Vector3(horizontal, 0, vertical).normalized;
-
-        Debug.Log("Direction magnitude: " + direction.magnitude);    
+        Vector3 direction = new Vector3(horizontal, 0, vertical).normalized;  
 
         // Move the player if there is any input
         if (direction.magnitude >= 0.2f)
@@ -132,8 +130,6 @@ public class PlayerControllerAI : MonoBehaviour
 
             // Smoothly rotate towards the target angle
             float smoothAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref rotationSpeed, 0.1f);
-
-            Debug.Log("Smooth angle: " + smoothAngle);
 
             // Rotate the player on the Y axis only
             transform.rotation = Quaternion.Euler(0, smoothAngle, 0);
