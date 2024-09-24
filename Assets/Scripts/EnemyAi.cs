@@ -26,6 +26,12 @@ public class EnemyAi : MonoBehaviour
     // Timer-related variables
     private float startTime; // Time the game started
     private float elapsedTime; // Elapsed time since the game started
+    public float attackCooldown = 2f; // Time in seconds between attacks
+    private float lastAttackTime = 0f; // Time when the last attack happened
+
+    // Audio
+    public AudioSource audioSource; // Reference to the AudioSource component
+    public AudioClip attackSound; // AudioClip for attack sound
 
     void Start()
     {
@@ -44,6 +50,11 @@ public class EnemyAi : MonoBehaviour
         if (animator == null)
         {
             animator = GetComponent<Animator>();
+        }
+
+        if (audioSource == null)
+        {
+            audioSource = GetComponent<AudioSource>();
         }
 
         // Record the start time
@@ -99,16 +110,23 @@ public class EnemyAi : MonoBehaviour
 
     void AttackPlayer()
     {
-        // Stop moving and set Speed to 0 in the Animator
-        animator.SetFloat("Speed", 0);
-        
-        // Trigger the attack animation
-        animator.SetTrigger("Attack");
 
-        // Apply damage to the player (if health component exists)
-        if (playerHealth != null)
+        // Check if enough time has passed since the last attack
+        if (Time.time >= lastAttackTime + attackCooldown)
         {
-            playerHealth.TakeDamage(damage);
+            
+            PlaySound(attackSound); // Play the attack sound
+
+            animator.SetFloat("Speed", 0);
+            animator.SetTrigger("Attack");
+
+            if (playerHealth != null)
+            {
+                playerHealth.TakeDamage(damage);
+            }
+
+            // Record the time of the attack
+            lastAttackTime = Time.time;
         }
     }
 
@@ -127,6 +145,14 @@ public class EnemyAi : MonoBehaviour
         if (message.Equals("AnimationDamageEnded"))
         {
             currentState = SlimeAnimationState.Idle;
+        }
+    }
+
+    void PlaySound(AudioClip clip)
+    {
+        if (audioSource != null && clip != null)
+        {
+            audioSource.PlayOneShot(clip);
         }
     }
 }

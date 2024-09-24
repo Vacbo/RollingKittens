@@ -65,7 +65,7 @@ public class PlayerControllerAI : MonoBehaviour
         SetScoreText();
 
         // Lock rotation on the X and Z axes (only rotate around Y)
-        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+        rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezeRotationZ;
 
         // Ensure the AudioSource is attached to the player
         if (audioSource == null)
@@ -122,6 +122,8 @@ public class PlayerControllerAI : MonoBehaviour
         // Create a movement vector based on input
         Vector3 direction = new Vector3(horizontal, 0, vertical).normalized;
 
+        Debug.Log("Direction magnitude: " + direction.magnitude);    
+
         // Move the player if there is any input
         if (direction.magnitude >= 0.2f)
         {
@@ -130,6 +132,8 @@ public class PlayerControllerAI : MonoBehaviour
 
             // Smoothly rotate towards the target angle
             float smoothAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref rotationSpeed, 0.1f);
+
+            Debug.Log("Smooth angle: " + smoothAngle);
 
             // Rotate the player on the Y axis only
             transform.rotation = Quaternion.Euler(0, smoothAngle, 0);
@@ -149,6 +153,9 @@ public class PlayerControllerAI : MonoBehaviour
 
             // Stop the player's movement on XZ axes if no input (but keep Y for gravity)
             rb.velocity = new Vector3(0, rb.velocity.y, 0);
+
+            // Stop rotating the player when idle
+            transform.rotation = Quaternion.Euler(0, transform.eulerAngles.y, 0);
         }
 
         // Jump logic (apply force to Rigidbody)
